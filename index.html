@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PIPO PRO - Professional Proposal V7</title>
+    <title>Orçamento CPUSIS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,27 +25,36 @@
         .step-content.active { display: block; animation: slideIn 0.3s ease-out; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* ESTILO PARA O PDF (IMPRESSÃO) */
         @media print {
-            header, #step-indicator, #syncBtn, .no-print, button, .reg-btn, #pcCount, #sysSelect, #discountSelect { display: none !important; }
-            body { background: white !important; color: black !important; }
-            .step-content { display: block !important; }
+            @page { size: A4; margin: 0; }
+            header, .no-print, button, #syncBtn, #themeToggle, .step-indicator { display: none !important; }
+            body { background: white !important; color: black !important; padding: 0 !important; margin: 0 !important; }
             .dark { background: white !important; }
-            .print-only { display: block !important; }
-            .bg-darkCard, .bg-slate-100, .bg-brand { background: transparent !important; color: black !important; border: 1px solid #eee !important; box-shadow: none !important; }
-            .shadow-2xl, .shadow-xl { box-shadow: none !important; }
-            main { padding-top: 0 !important; }
+            main { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
+            #proposalCard { 
+                box-shadow: none !important; 
+                border: none !important; 
+                padding: 40px !important; 
+                width: 100% !important;
+                background: white !important;
+                color: black !important;
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact;
+            }
+            .bg-brand { background-color: #3b82f6 !important; color: white !important; }
+            .text-brand { color: #3b82f6 !important; }
+            .bg-slate-100, .dark\:bg-white\/5 { background-color: #f8fafc !important; border: 1px solid #e2e8f0 !important; }
+            .text-slate-400 { color: #64748b !important; }
         }
-        .print-only { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-slate-100 min-h-screen">
 
-    <header class="fixed top-0 w-full z-50 glass border-b dark:border-white/5 bg-white/70 dark:bg-darkBg/70 backdrop-blur-xl">
+    <header class="fixed top-0 w-full z-50 glass border-b dark:border-white/5 bg-white/70 dark:bg-darkBg/70 backdrop-blur-xl no-print">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-brand rounded-xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-bolt"></i></div>
-                <span class="text-xl font-extrabold tracking-tight">PIPO <span class="text-brand">PRO</span></span>
+                <div class="w-10 h-10 bg-brand rounded-xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-lighthouse"></i></div>
+                <span class="text-xl font-extrabold tracking-tight uppercase">Orçamento <span class="text-brand">CPUSIS</span></span>
             </div>
             <div class="flex items-center gap-4">
                 <button onclick="showTab('config')" class="w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-white/10"><i class="fas fa-cog"></i></button>
@@ -54,120 +63,133 @@
         </div>
     </header>
 
-    <main class="pt-40 pb-20 px-6 max-w-5xl mx-auto">
+    <main class="pt-32 pb-20 px-6 max-w-5xl mx-auto">
         
-        <section id="step-home" class="step-content active text-center py-20">
+        <section id="step-home" class="step-content active text-center py-20 no-print">
             <button onclick="goToStep('cadastro')" class="bg-brand hover:bg-brandHover text-white px-12 py-6 rounded-3xl font-black text-xl shadow-2xl transition-all hover:scale-105 active:scale-95">
                 INICIAR NOVO ORÇAMENTO <i class="fas fa-chevron-right ml-3"></i>
             </button>
         </section>
 
-        <section id="step-cadastro" class="step-content">
-            <div class="bg-white dark:bg-darkCard rounded-4xl p-12 shadow-2xl border dark:border-white/5 relative">
-                <button onclick="goToStep('home')" class="absolute top-8 left-8 text-slate-400 font-bold text-sm hover:text-brand"><i class="fas fa-chevron-left"></i> VOLTAR</button>
-                <div class="text-center mb-10 pt-4"><h2 class="text-2xl font-black">Dados do Cliente</h2></div>
+        <section id="step-cadastro" class="step-content no-print">
+            <div class="bg-white dark:bg-darkCard rounded-4xl p-10 shadow-2xl border dark:border-white/5 relative">
+                <button onclick="goToStep('home')" class="absolute top-8 left-8 text-slate-400 font-bold text-xs hover:text-brand"><i class="fas fa-chevron-left mr-2"></i> VOLTAR</button>
+                <div class="text-center mb-10 pt-4"><h2 class="text-2xl font-black">Registro da Proposta</h2></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="md:col-span-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Vendedor</label>
+                        <input type="text" id="salesName" placeholder="Vendedor" class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
+                    </div>
+                    <div class="md:col-span-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Cliente / Razão Social</label>
-                        <input type="text" id="clientName" placeholder="..." class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
+                        <input type="text" id="clientName" placeholder="Nome da Empresa" class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
                     </div>
                     <div>
                         <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">CNPJ / CPF</label>
-                        <input type="text" id="clientTax" placeholder="000..." class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
+                        <input type="text" id="clientTax" placeholder="00.000..." class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
                     </div>
                     <div>
                         <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Telefone</label>
-                        <input type="text" id="clientPhone" placeholder="..." class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
+                        <input type="text" id="clientPhone" placeholder="(00) 00000-0000" class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
                     </div>
                 </div>
                 <div class="mt-10">
-                    <button onclick="goToStep('orcamento')" class="w-full bg-slate-900 dark:bg-white dark:text-slate-900 text-white p-6 rounded-3xl font-black shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95">CONTINUAR PARA VALORES <i class="fas fa-calculator"></i></button>
+                    <button onclick="goToStep('orcamento')" class="w-full bg-brand text-white p-6 rounded-3xl font-black shadow-xl transition-all active:scale-95">DEFINIR VALORES <i class="fas fa-arrow-right ml-2"></i></button>
                 </div>
             </div>
         </section>
 
         <section id="step-orcamento" class="step-content">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <div class="lg:col-span-5 space-y-6 no-print">
-                    <div class="bg-white dark:bg-darkCard p-8 rounded-4xl border dark:border-white/5 shadow-xl">
-                        <button onclick="goToStep('cadastro')" class="mb-6 text-slate-400 hover:text-brand transition-colors flex items-center gap-2 font-bold text-xs"><i class="fas fa-chevron-left"></i> ALTERAR CLIENTE</button>
-                        <div class="space-y-6">
+                <div class="lg:col-span-4 space-y-4 no-print">
+                    <div class="bg-white dark:bg-darkCard p-6 rounded-4xl border dark:border-white/5 shadow-xl">
+                        <div class="space-y-4">
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-2 block">Sistema</label>
-                                <select id="sysSelect" onchange="calculate()" class="w-full bg-slate-100 dark:bg-slate-900/50 p-4 rounded-2xl outline-none font-bold border-none text-brand"></select>
+                                <label class="text-[9px] font-bold text-slate-400 uppercase block mb-2">Sistema Selecionado</label>
+                                <select id="sysSelect" onchange="calculate()" class="w-full bg-slate-100 dark:bg-slate-900/50 p-4 rounded-2xl font-bold border-none text-brand"></select>
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-2 block">Terminais</label>
-                                <div class="flex items-center gap-4 bg-slate-100 dark:bg-slate-900/50 p-2 rounded-3xl">
-                                    <button onclick="changePC(-1)" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm"><i class="fas fa-minus"></i></button>
+                                <label class="text-[9px] font-bold text-slate-400 uppercase block mb-2">Terminais</label>
+                                <div class="flex items-center gap-3 bg-slate-100 dark:bg-slate-900/50 p-2 rounded-2xl">
+                                    <button onclick="changePC(-1)" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800"><i class="fas fa-minus"></i></button>
                                     <input type="number" id="pcCount" value="1" min="1" class="flex-1 bg-transparent text-center font-black outline-none border-none">
-                                    <button onclick="changePC(1)" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm"><i class="fas fa-plus"></i></button>
+                                    <button onclick="changePC(1)" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800"><i class="fas fa-plus"></i></button>
                                 </div>
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-2 block">Aplicar Desconto (Instalação)</label>
-                                <select id="discountSelect" onchange="calculate()" class="w-full bg-slate-100 dark:bg-slate-900/50 p-4 rounded-2xl outline-none font-bold border-none text-emerald-500">
-                                    <option value="0">Sem Desconto (0%)</option>
-                                    <option value="0.10">Desconto de 10%</option>
-                                    <option value="0.15">Desconto de 15%</option>
-                                    <option value="0.20">Desconto de 20%</option>
+                                <label class="text-[9px] font-bold text-slate-400 uppercase block mb-2">Desconto Implantação</label>
+                                <select id="discountSelect" onchange="calculate()" class="w-full bg-slate-100 dark:bg-slate-900/50 p-4 rounded-2xl font-bold border-none text-emerald-500">
+                                    <option value="0">0%</option>
+                                    <option value="0.10">10%</option>
+                                    <option value="0.15">15%</option>
+                                    <option value="0.20">20%</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-2 block">Regime Fiscal</label>
-                                <div class="grid grid-cols-3 gap-2">
-                                    <button onclick="setRegime('MEI')" id="reg-MEI" class="reg-btn p-3 rounded-xl border-2 dark:border-slate-800 text-[9px] font-black">MEI</button>
-                                    <button onclick="setRegime('SIMPLES')" id="reg-SIMPLES" class="reg-btn p-3 rounded-xl border-2 dark:border-slate-800 text-[9px] font-black">SIMPLES</button>
-                                    <button onclick="setRegime('PRESUMIDO')" id="reg-PRESUMIDO" class="reg-btn p-3 rounded-xl border-2 dark:border-slate-800 text-[9px] font-black">PRESUMIDO</button>
+                                <label class="text-[9px] font-bold text-slate-400 uppercase block mb-2">Regime</label>
+                                <div class="grid grid-cols-3 gap-1">
+                                    <button onclick="setRegime('MEI')" id="reg-MEI" class="reg-btn p-2 rounded-lg border dark:border-slate-800 text-[8px] font-black">MEI</button>
+                                    <button onclick="setRegime('SIMPLES')" id="reg-SIMPLES" class="reg-btn p-2 rounded-lg border dark:border-slate-800 text-[8px] font-black">SIMPLES</button>
+                                    <button onclick="setRegime('PRESUMIDO')" id="reg-PRESUMIDO" class="reg-btn p-2 rounded-lg border dark:border-slate-800 text-[8px] font-black">PRESUM.</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-7">
-                    <div id="proposalCard" class="bg-white dark:bg-darkCard p-10 rounded-4xl border dark:border-white/5 shadow-2xl">
-                        <div class="flex justify-between items-center mb-8">
+                <div class="lg:col-span-8">
+                    <div id="proposalCard" class="bg-white dark:bg-darkCard p-12 rounded-4xl border dark:border-white/5 shadow-2xl relative">
+                        <div class="flex justify-between items-start mb-12">
                             <div>
-                                <h1 class="text-3xl font-black">Proposta Comercial</h1>
-                                <p class="text-slate-400 text-sm mt-1" id="resClientLabel"></p>
+                                <h1 class="text-4xl font-black tracking-tighter">Proposta Comercial</h1>
+                                <p class="text-slate-400 font-bold mt-2 uppercase tracking-widest text-xs" id="resClientLabel"></p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[10px] font-black text-brand uppercase">Pipo Pro System</p>
-                                <p class="text-[9px] text-slate-400" id="resDate"></p>
+                                <div class="w-12 h-12 bg-brand rounded-2xl ml-auto mb-2 flex items-center justify-center text-white"><i class="fas fa-file-invoice-dollar"></i></div>
+                                <p class="text-[10px] font-black" id="resDate"></p>
+                                <p class="text-[9px] text-brand uppercase font-bold" id="resVendedor"></p>
                             </div>
                         </div>
 
-                        <table class="w-full mb-10 border-collapse">
+                        <table class="w-full mb-12 border-collapse">
                             <thead>
                                 <tr class="text-left border-b-2 dark:border-white/10 text-slate-400">
-                                    <th class="py-4 text-[10px] font-black uppercase tracking-widest">Descrição do Serviço</th>
-                                    <th class="py-4 text-right text-[10px] font-black uppercase tracking-widest">Valor</th>
+                                    <th class="py-4 text-[10px] font-black uppercase tracking-widest">Descrição detalhada do Serviço</th>
+                                    <th class="py-4 text-right text-[10px] font-black uppercase tracking-widest">Investimento</th>
                                 </tr>
                             </thead>
-                            <tbody class="text-sm font-bold">
+                            <tbody class="font-bold">
                                 <tr class="border-b dark:border-white/5">
-                                    <td class="py-6">Licenciamento Mensal (<span id="resSysName"></span>) <br><span class="text-[10px] opacity-40">Acesso completo + Suporte técnico</span></td>
-                                    <td class="py-6 text-right text-lg" id="resMensal">R$ 0,00</td>
+                                    <td class="py-8">
+                                        <span class="text-lg">Licenciamento Mensal de Software</span><br>
+                                        <span class="text-[10px] opacity-40 font-medium">Sistema <span id="resSysName"></span> • Suporte Técnico Premium • Cloud Backup</span>
+                                    </td>
+                                    <td class="py-8 text-right text-xl" id="resMensal">R$ 0,00</td>
                                 </tr>
                                 <tr class="border-b dark:border-white/5">
-                                    <td class="py-6">Instalação, Configuração e Treinamento <br><span class="text-[10px] opacity-40">Implantação personalizada e capacitação da equipe</span></td>
-                                    <td class="py-6 text-right text-lg text-brand" id="resSetup">R$ 0,00</td>
+                                    <td class="py-8">
+                                        <span class="text-lg">Instalação, Configuração e Treinamento</span><br>
+                                        <span class="text-[10px] opacity-40 font-medium">Implantação personalizada, parametrização fiscal e capacitação operacional.</span>
+                                    </td>
+                                    <td class="py-8 text-right text-xl text-brand" id="resSetup">R$ 0,00</td>
                                 </tr>
                             </tbody>
                         </table>
 
-                        <div class="p-6 rounded-3xl bg-slate-100 dark:bg-white/5">
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Resumo da Configuração</p>
-                            <div class="flex gap-6 text-[11px] font-bold uppercase opacity-80">
-                                <span><i class="fas fa-desktop mr-1 text-brand"></i> <span id="resPcs"></span> Terminais</span>
-                                <span><i class="fas fa-building mr-1 text-brand"></i> <span id="resRegime"></span></span>
+                        <div class="grid grid-cols-2 gap-4 mb-12">
+                            <div class="p-6 rounded-3xl bg-slate-100 dark:bg-white/5 border dark:border-white/5 text-center">
+                                <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Terminais</p>
+                                <p class="text-sm font-black"><span id="resPcs"></span> Estação(ões)</p>
+                            </div>
+                            <div class="p-6 rounded-3xl bg-slate-100 dark:bg-white/5 border dark:border-white/5 text-center">
+                                <p class="text-[9px] font-black text-slate-400 uppercase mb-2">Regime Fiscal</p>
+                                <p class="text-sm font-black uppercase"><span id="resRegime"></span></p>
                             </div>
                         </div>
 
-                        <div class="mt-10 text-center no-print">
-                            <button id="syncBtn" onclick="generatePDF()" class="w-full bg-slate-900 dark:bg-white dark:text-slate-900 text-white py-5 rounded-3xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all">
-                                <i class="fas fa-file-pdf"></i> GERAR PDF & SINCRONIZAR
+                        <div class="text-center mt-6 no-print">
+                            <button onclick="generatePDF()" class="w-full bg-slate-900 dark:bg-white dark:text-slate-900 text-white py-6 rounded-3xl font-black text-lg shadow-2xl hover:scale-[1.01] transition-all">
+                                <i class="fas fa-file-pdf mr-2"></i> GERAR PDF E REGISTRAR
                             </button>
                         </div>
                     </div>
@@ -175,21 +197,23 @@
             </div>
         </section>
 
-        <section id="step-config" class="step-content max-w-3xl mx-auto">
+        <section id="step-config" class="step-content max-w-3xl mx-auto no-print">
             <div class="bg-white dark:bg-darkCard rounded-4xl p-10 border dark:border-white/5 shadow-2xl">
-                <div class="flex justify-between items-center mb-10"><h2 class="text-2xl font-black">Configurações</h2><button onclick="goToStep('home')" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center"><i class="fas fa-times"></i></button></div>
-                <div class="mb-10 p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/20">
-                    <label class="text-xs font-black text-emerald-500 uppercase mb-3 block">URL Sincronização Planilha</label>
-                    <input type="text" id="sheetLink" placeholder="https://..." class="w-full bg-white dark:bg-darkBg p-4 rounded-2xl outline-none border-none font-medium text-sm">
+                <div class="flex justify-between items-center mb-10"><h2 class="text-2xl font-black">Ajustes</h2><button onclick="goToStep('home')" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center"><i class="fas fa-times"></i></button></div>
+                
+                <div class="mb-8 p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/20">
+                    <label class="text-xs font-black text-emerald-500 uppercase mb-3 block">URL Google Script (Webhook)</label>
+                    <input type="text" id="sheetLink" placeholder="https://script.google.com/macros/s/..." class="w-full bg-white dark:bg-darkBg p-4 rounded-2xl outline-none border-none font-medium text-sm">
                 </div>
+
                 <div id="systems-config-list" class="space-y-3 mb-8"></div>
-                <button onclick="addNewSystem()" class="text-brand text-xs font-black mb-10 block">+ NOVO SERVIÇO</button>
-                <button onclick="saveAllSettings()" class="w-full bg-brand text-white p-5 rounded-3xl font-black shadow-lg">SALVAR TUDO</button>
+                <button onclick="addNewSystem()" class="text-brand text-xs font-black mb-10 block">+ NOVO SISTEMA</button>
+                <button onclick="saveAllSettings()" class="w-full bg-brand text-white p-5 rounded-3xl font-black shadow-lg">SALVAR CONFIGURAÇÕES</button>
             </div>
         </section>
     </main>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl text-xs font-bold opacity-0 transition-all z-[100]"></div>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl text-xs font-bold opacity-0 transition-all z-[100] pointer-events-none"></div>
 
     <script>
         let CURRENT_REGIME = 'MEI';
@@ -203,7 +227,7 @@
             }
         };
 
-        const storage = localStorage.getItem('pipo_pro_v7');
+        const storage = localStorage.getItem('cpusis_data_v1');
         if(storage) APP_DATA = JSON.parse(storage);
 
         function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
@@ -229,13 +253,11 @@
             const base = sys[CURRENT_REGIME];
             const addon = (base * 0.20) * (pcs - 1);
             const monthly = base + addon;
-            
-            // Lógica de Desconto aplicada apenas ao Setup (Instalação)
-            const rawSetup = monthly * sys.multiplier;
-            const finalSetup = rawSetup * (1 - discount);
+            const finalSetup = (monthly * sys.multiplier) * (1 - discount);
 
             document.getElementById('resSysName').innerText = sysKey;
-            document.getElementById('resClientLabel').innerText = document.getElementById('clientName').value || "Cliente Preferencial";
+            document.getElementById('resClientLabel').innerText = document.getElementById('clientName').value || "CLIENTE";
+            document.getElementById('resVendedor').innerText = "Vendedor: " + (document.getElementById('salesName').value || "Não informado");
             document.getElementById('resDate').innerText = new Date().toLocaleDateString('pt-BR');
             document.getElementById('resMensal').innerText = fmt(monthly);
             document.getElementById('resSetup').innerText = fmt(finalSetup);
@@ -244,34 +266,36 @@
         }
 
         async function generatePDF() {
-            const btn = document.getElementById('syncBtn');
             const data = {
                 data: new Date().toLocaleDateString('pt-BR'),
-                cliente: document.getElementById('clientName').value,
+                vendedor: document.getElementById('salesName').value || "Não informado",
+                cliente: document.getElementById('clientName').value || "Consumidor",
                 sistema: document.getElementById('sysSelect').value,
                 mensalidade: document.getElementById('resMensal').innerText,
                 instalacao: document.getElementById('resSetup').innerText,
-                desconto: document.getElementById('discountSelect').value * 100 + "%"
+                terminais: document.getElementById('pcCount').value
             };
 
-            // 1. Sincroniza com a planilha em segundo plano
             if(APP_DATA.sheetLink) {
-                fetch(APP_DATA.sheetLink, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
+                showToast("Sincronizando com a Planilha...");
+                try {
+                    await fetch(APP_DATA.sheetLink, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: JSON.stringify(data)
+                    });
+                } catch(e) { console.log("Erro ao enviar dados."); }
             }
 
-            // 2. Abre a caixa de impressão do navegador (PDF)
-            showToast("Preparando Proposta Profissional...");
+            showToast("Gerando PDF Oficial...");
             setTimeout(() => { window.print(); }, 500);
         }
 
         function setRegime(reg) {
             CURRENT_REGIME = reg;
-            document.querySelectorAll('.reg-btn').forEach(b => {
-                b.classList.remove('bg-brand', 'text-white', 'border-brand');
-                b.classList.add('dark:border-slate-800', 'border-slate-200');
-            });
-            document.getElementById('reg-' + reg).classList.replace('dark:border-slate-800', 'border-brand');
-            document.getElementById('reg-' + reg).classList.add('bg-brand', 'text-white');
+            document.querySelectorAll('.reg-btn').forEach(b => b.classList.remove('bg-brand', 'text-white', 'border-brand'));
+            const activeBtn = document.getElementById('reg-' + reg);
+            activeBtn.classList.add('bg-brand', 'text-white', 'border-brand');
             calculate();
         }
 
@@ -290,15 +314,15 @@
                 div.innerHTML = `<div class="flex-1">
                         <span class="text-[9px] font-bold text-slate-500 uppercase">${name}</span>
                         <div class="grid grid-cols-4 gap-2 mt-1">
-                            <input type="number" onchange="updateSysVal('${name}', 'MEI', this.value)" value="${values.MEI}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none">
-                            <input type="number" onchange="updateSysVal('${name}', 'SIMPLES', this.value)" value="${values.SIMPLES}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none">
-                            <input type="number" onchange="updateSysVal('${name}', 'PRESUMIDO', this.value)" value="${values.PRESUMIDO}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none">
-                            <input type="number" onchange="updateSysVal('${name}', 'multiplier', this.value)" value="${values.multiplier}" class="bg-brand/10 text-brand p-2 rounded-lg text-xs font-black border-none">
+                            <input type="number" onchange="updateSysVal('${name}', 'MEI', this.value)" value="${values.MEI}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none outline-none">
+                            <input type="number" onchange="updateSysVal('${name}', 'SIMPLES', this.value)" value="${values.SIMPLES}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none outline-none">
+                            <input type="number" onchange="updateSysVal('${name}', 'PRESUMIDO', this.value)" value="${values.PRESUMIDO}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none outline-none">
+                            <input type="number" onchange="updateSysVal('${name}', 'multiplier', this.value)" value="${values.multiplier}" class="bg-brand/10 text-brand p-2 rounded-lg text-xs font-black border-none outline-none">
                         </div>
                     </div><button onclick="removeSystem('${name}')" class="text-red-500 p-2"><i class="fas fa-trash"></i></button>`;
                 container.appendChild(div);
             });
-            document.getElementById('sheetLink').value = APP_DATA.sheetLink;
+            document.getElementById('sheetLink').value = APP_DATA.sheetLink || "";
         }
 
         function updateSysVal(sys, field, val) { APP_DATA.systems[sys][field] = parseFloat(val); }
@@ -312,7 +336,7 @@
         function removeSystem(name) { delete APP_DATA.systems[name]; renderConfigSystems(); }
         function saveAllSettings() {
             APP_DATA.sheetLink = document.getElementById('sheetLink').value;
-            localStorage.setItem('pipo_pro_v7', JSON.stringify(APP_DATA));
+            localStorage.setItem('cpusis_data_v1', JSON.stringify(APP_DATA));
             initSelects(); showToast("Configurações Salvas!"); goToStep('home');
         }
         function initSelects() {
