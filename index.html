@@ -3,355 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orçamento CPUSIS</title>
+    <title>PIPO PRO - Professional Proposal V7</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        darkBg: '#0b0f1a',
-                        darkCard: '#161b2c',
-                        brand: '#3b82f6',
-                        brandHover: '#2563eb',
-                        success: '#10b981'
-                    },
-                    borderRadius: {
-                        '3xl': '1.5rem',
-                        '4xl': '2rem',
-                    }
+                    colors: { darkBg: '#05070a', darkCard: '#0f121d', brand: '#3b82f6', accent: '#8b5cf6' },
+                    borderRadius: { '4xl': '2rem' }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); }
-        .tab-btn { @apply flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold text-sm transition-all duration-300; }
-        .tab-active { @apply bg-brand text-white shadow-lg shadow-brand/30 scale-105; }
-        .tab-inactive { @apply text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800; }
-        input, select { @apply transition-all duration-200 focus:scale-[1.01] !important; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .step-content { display: none; }
+        .step-content.active { display: block; animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Esconder setas do input number */
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        /* ESTILO PARA O PDF (IMPRESSÃO) */
+        @media print {
+            header, #step-indicator, #syncBtn, .no-print, button, .reg-btn, #pcCount, #sysSelect, #discountSelect { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .step-content { display: block !important; }
+            .dark { background: white !important; }
+            .print-only { display: block !important; }
+            .bg-darkCard, .bg-slate-100, .bg-brand { background: transparent !important; color: black !important; border: 1px solid #eee !important; box-shadow: none !important; }
+            .shadow-2xl, .shadow-xl { box-shadow: none !important; }
+            main { padding-top: 0 !important; }
+        }
+        .print-only { display: none; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-slate-100 min-h-screen">
 
-    <!-- HEADER / NAV -->
-    <header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-darkBg/80 backdrop-blur-md">
+    <header class="fixed top-0 w-full z-50 glass border-b dark:border-white/5 bg-white/70 dark:bg-darkBg/70 backdrop-blur-xl">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-gradient-to-tr from-brand to-blue-400 rounded-2xl flex items-center justify-center text-white shadow-xl rotate-3">
-                    <i class="fas fa-chart-pie text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl font-extrabold tracking-tight">CPU <span class="text-brand">SIS</span></h1>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">SISTEMA ORÇAMENTÁRIO</p>
-                </div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-brand rounded-xl flex items-center justify-center text-white shadow-lg"><i class="fas fa-bolt"></i></div>
+                <span class="text-xl font-extrabold tracking-tight">PIPO <span class="text-brand">PRO</span></span>
             </div>
-
-            <!-- TABS MOBILE/DESKTOP -->
-            <nav class="hidden md:flex bg-slate-100 dark:bg-slate-900/50 p-1.5 rounded-3xl border border-slate-200 dark:border-slate-800">
-                <button onclick="switchTab('orcamento')" id="btn-orcamento" class="tab-btn tab-active">
-                    <i class="fas fa-calculator"></i> Orçamento
-                </button>
-                <button onclick="switchTab('cliente')" id="btn-cliente" class="tab-btn tab-inactive">
-                    <i class="fas fa-user-tie"></i> Registro Cliente
-                </button>
-                <button onclick="switchTab('config')" id="btn-config" class="tab-btn tab-inactive">
-                    <i class="fas fa-cog"></i> Configurações
-                </button>
-            </nav>
-
-            <button id="themeToggle" class="w-12 h-12 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 transition-colors">
-                <i class="fas fa-moon dark:hidden"></i>
-                <i class="fas fa-sun hidden dark:block text-yellow-400"></i>
-            </button>
+            <div class="flex items-center gap-4">
+                <button onclick="showTab('config')" class="w-10 h-10 rounded-full hover:bg-slate-200 dark:hover:bg-white/10"><i class="fas fa-cog"></i></button>
+                <div id="themeToggle" class="cursor-pointer p-2"><i class="fas fa-moon dark:hidden"></i><i class="fas fa-sun hidden dark:block text-yellow-400"></i></div>
+            </div>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-6">
+    <main class="pt-40 pb-20 px-6 max-w-5xl mx-auto">
         
-        <!-- ABA ORÇAMENTO -->
-        <div id="tab-orcamento" class="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-in fade-in duration-500">
-            
-            <!-- COLUNA ESQUERDA: ENTRADAS -->
-            <div class="lg:col-span-5 space-y-6">
-                <div class="bg-white dark:bg-darkCard p-8 rounded-4xl shadow-2xl shadow-slate-200/50 dark:shadow-none border border-slate-100 dark:border-slate-800">
-                    <h2 class="text-lg font-bold mb-8 flex items-center gap-3">
-                        <span class="w-1.5 h-6 bg-brand rounded-full"></span>
-                        Configuração do Plano
-                    </h2>
+        <section id="step-home" class="step-content active text-center py-20">
+            <button onclick="goToStep('cadastro')" class="bg-brand hover:bg-brandHover text-white px-12 py-6 rounded-3xl font-black text-xl shadow-2xl transition-all hover:scale-105 active:scale-95">
+                INICIAR NOVO ORÇAMENTO <i class="fas fa-chevron-right ml-3"></i>
+            </button>
+        </section>
 
-                    <div class="space-y-6">
-                        <div class="group">
-                            <label class="text-xs font-black text-slate-400 uppercase mb-2 block ml-1">Sistema Solicitado</label>
-                            <select id="sysSelect" class="w-full bg-slate-50 dark:bg-slate-900 border-2 border-transparent focus:border-brand p-4 rounded-2xl outline-none font-bold text-lg appearance-none transition-all"></select>
-                        </div>
-
-                        <div class="group">
-                            <label class="text-xs font-black text-slate-400 uppercase mb-2 block ml-1">Regime Tributário</label>
-                            <div class="grid grid-cols-3 gap-2">
-                                <button onclick="setRegime('MEI')" id="reg-MEI" class="regime-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-800 text-xs font-bold transition-all">MEI</button>
-                                <button onclick="setRegime('SIMPLES')" id="reg-SIMPLES" class="regime-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-800 text-xs font-bold transition-all">SIMPLES</button>
-                                <button onclick="setRegime('PRESUMIDO')" id="reg-PRESUMIDO" class="regime-btn p-3 rounded-xl border-2 border-slate-200 dark:border-slate-800 text-xs font-bold transition-all">L. PRESUMIDO</button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-black text-slate-400 uppercase mb-2 block ml-1">Quantidade de Terminais (PCs)</label>
-                            <div class="flex items-center gap-4 bg-slate-100 dark:bg-slate-900 p-2 rounded-2xl">
-                                <button onclick="changePC(-1)" class="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-md hover:bg-brand hover:text-white transition-all">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <input type="number" id="pcCount" value="1" min="1" class="flex-1 bg-transparent text-center text-2xl font-black outline-none">
-                                <button onclick="changePC(1)" class="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-md hover:bg-brand hover:text-white transition-all">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                        </div>
+        <section id="step-cadastro" class="step-content">
+            <div class="bg-white dark:bg-darkCard rounded-4xl p-12 shadow-2xl border dark:border-white/5 relative">
+                <button onclick="goToStep('home')" class="absolute top-8 left-8 text-slate-400 font-bold text-sm hover:text-brand"><i class="fas fa-chevron-left"></i> VOLTAR</button>
+                <div class="text-center mb-10 pt-4"><h2 class="text-2xl font-black">Dados do Cliente</h2></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Cliente / Razão Social</label>
+                        <input type="text" id="clientName" placeholder="..." class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
                     </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">CNPJ / CPF</label>
+                        <input type="text" id="clientTax" placeholder="000..." class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black text-slate-400 uppercase ml-2 mb-2 block">Telefone</label>
+                        <input type="text" id="clientPhone" placeholder="..." class="w-full bg-slate-100 dark:bg-slate-900/50 p-5 rounded-3xl outline-none focus:ring-2 ring-brand border-none font-bold">
+                    </div>
+                </div>
+                <div class="mt-10">
+                    <button onclick="goToStep('orcamento')" class="w-full bg-slate-900 dark:bg-white dark:text-slate-900 text-white p-6 rounded-3xl font-black shadow-xl flex items-center justify-center gap-3 transition-all active:scale-95">CONTINUAR PARA VALORES <i class="fas fa-calculator"></i></button>
+                </div>
+            </div>
+        </section>
 
-                    <div class="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800 space-y-6">
-                        <h3 class="text-xs font-black text-brand uppercase tracking-widest">Condições Especiais</h3>
-                        
-                        <div class="grid grid-cols-2 gap-4">
+        <section id="step-orcamento" class="step-content">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-5 space-y-6 no-print">
+                    <div class="bg-white dark:bg-darkCard p-8 rounded-4xl border dark:border-white/5 shadow-xl">
+                        <button onclick="goToStep('cadastro')" class="mb-6 text-slate-400 hover:text-brand transition-colors flex items-center gap-2 font-bold text-xs"><i class="fas fa-chevron-left"></i> ALTERAR CLIENTE</button>
+                        <div class="space-y-6">
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Desconto Setup (R$)</label>
-                                <input type="number" id="setupDiscount" placeholder="0,00" class="w-full bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border-2 border-transparent focus:border-emerald-500 outline-none font-bold text-emerald-600">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-2 block">Sistema</label>
+                                <select id="sysSelect" onchange="calculate()" class="w-full bg-slate-100 dark:bg-slate-900/50 p-4 rounded-2xl outline-none font-bold border-none text-brand"></select>
                             </div>
                             <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Parcelas Setup</label>
-                                <select id="installments" class="w-full bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border-2 border-transparent focus:border-brand outline-none font-bold">
-                                    <option value="1">À Vista</option>
-                                    <option value="2">2x s/ Juros</option>
-                                    <option value="3">3x s/ Juros</option>
-                                    <option value="4">4x s/ Juros</option>
-                                    <option value="5">5x s/ Juros</option>
-                                    <option value="6">6x s/ Juros</option>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-2 block">Terminais</label>
+                                <div class="flex items-center gap-4 bg-slate-100 dark:bg-slate-900/50 p-2 rounded-3xl">
+                                    <button onclick="changePC(-1)" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm"><i class="fas fa-minus"></i></button>
+                                    <input type="number" id="pcCount" value="1" min="1" class="flex-1 bg-transparent text-center font-black outline-none border-none">
+                                    <button onclick="changePC(1)" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 shadow-sm"><i class="fas fa-plus"></i></button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-2 block">Aplicar Desconto (Instalação)</label>
+                                <select id="discountSelect" onchange="calculate()" class="w-full bg-slate-100 dark:bg-slate-900/50 p-4 rounded-2xl outline-none font-bold border-none text-emerald-500">
+                                    <option value="0">Sem Desconto (0%)</option>
+                                    <option value="0.10">Desconto de 10%</option>
+                                    <option value="0.15">Desconto de 15%</option>
+                                    <option value="0.20">Desconto de 20%</option>
                                 </select>
                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- COLUNA DIREITA: RESULTADOS -->
-            <div class="lg:col-span-7">
-                <div class="bg-white dark:bg-darkCard p-8 rounded-4xl shadow-2xl border border-slate-100 dark:border-slate-800 h-full">
-                    <div class="flex justify-between items-start mb-10">
-                        <div>
-                            <h2 class="text-2xl font-black">Resumo do Negócio</h2>
-                            <p class="text-slate-400 text-sm">Cálculos baseados na Lógica PIPO de expansão.</p>
-                        </div>
-                        <div id="badgeStatus" class="px-4 py-1.5 bg-brand/10 text-brand rounded-full text-[10px] font-black uppercase tracking-widest">Ativo</div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-6 mb-8">
-                        <div class="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Base do Sistema</p>
-                            <p class="text-2xl font-black" id="resBase">R$ 0,00</p>
-                        </div>
-                        <div class="p-6 rounded-3xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800">
-                            <p class="text-[10px] font-black text-slate-400 uppercase mb-1">Adicional PIPO (20%)</p>
-                            <p class="text-2xl font-black text-brand" id="resPipo">R$ 0,00</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-6">
-                        <!-- MENSALIDADE -->
-                        <div class="relative overflow-hidden group p-8 rounded-4xl bg-gradient-to-br from-brand to-blue-600 text-white shadow-xl shadow-brand/20">
-                            <div class="relative z-10 flex justify-between items-center">
-                                <div>
-                                    <p class="text-xs font-black uppercase opacity-70 tracking-widest mb-1">Mensalidade Recorrente</p>
-                                    <h3 class="text-5xl font-black tracking-tighter" id="resMensal">R$ 0,00</h3>
-                                </div>
-                                <div class="w-16 h-16 bg-white/10 rounded-3xl flex items-center justify-center text-3xl">
-                                    <i class="fas fa-calendar-alt"></i>
-                                </div>
-                            </div>
-                            <!-- Decorativo -->
-                            <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-                        </div>
-
-                        <!-- SETUP -->
-                        <div class="p-8 rounded-4xl bg-slate-900 dark:bg-slate-800 text-white shadow-xl">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <p class="text-xs font-black uppercase opacity-70 tracking-widest" id="setupLabel">Setup de Implantação</p>
-                                        <span class="bg-emerald-500 text-[9px] px-2 py-0.5 rounded-full font-black">PAGAMENTO ÚNICO</span>
-                                    </div>
-                                    <h3 class="text-4xl font-black tracking-tighter" id="resSetup">R$ 0,00</h3>
-                                    <p class="text-xs mt-2 text-brand font-bold" id="resParcelas"></p>
-                                </div>
-                                <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center text-2xl text-brand">
-                                    <i class="fas fa-rocket"></i>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-2 block">Regime Fiscal</label>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <button onclick="setRegime('MEI')" id="reg-MEI" class="reg-btn p-3 rounded-xl border-2 dark:border-slate-800 text-[9px] font-black">MEI</button>
+                                    <button onclick="setRegime('SIMPLES')" id="reg-SIMPLES" class="reg-btn p-3 rounded-xl border-2 dark:border-slate-800 text-[9px] font-black">SIMPLES</button>
+                                    <button onclick="setRegime('PRESUMIDO')" id="reg-PRESUMIDO" class="reg-btn p-3 rounded-xl border-2 dark:border-slate-800 text-[9px] font-black">PRESUMIDO</button>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div class="flex flex-col items-center text-center p-4">
-                            <i class="fas fa-check-circle text-emerald-500 mb-2"></i>
-                            <span class="text-[10px] font-bold uppercase opacity-60">Treinamento</span>
+                <div class="lg:col-span-7">
+                    <div id="proposalCard" class="bg-white dark:bg-darkCard p-10 rounded-4xl border dark:border-white/5 shadow-2xl">
+                        <div class="flex justify-between items-center mb-8">
+                            <div>
+                                <h1 class="text-3xl font-black">Proposta Comercial</h1>
+                                <p class="text-slate-400 text-sm mt-1" id="resClientLabel"></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] font-black text-brand uppercase">Pipo Pro System</p>
+                                <p class="text-[9px] text-slate-400" id="resDate"></p>
+                            </div>
                         </div>
-                        <div class="flex flex-col items-center text-center p-4">
-                            <i class="fas fa-check-circle text-emerald-500 mb-2"></i>
-                            <span class="text-[10px] font-bold uppercase opacity-60">Configuração</span>
+
+                        <table class="w-full mb-10 border-collapse">
+                            <thead>
+                                <tr class="text-left border-b-2 dark:border-white/10 text-slate-400">
+                                    <th class="py-4 text-[10px] font-black uppercase tracking-widest">Descrição do Serviço</th>
+                                    <th class="py-4 text-right text-[10px] font-black uppercase tracking-widest">Valor</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-sm font-bold">
+                                <tr class="border-b dark:border-white/5">
+                                    <td class="py-6">Licenciamento Mensal (<span id="resSysName"></span>) <br><span class="text-[10px] opacity-40">Acesso completo + Suporte técnico</span></td>
+                                    <td class="py-6 text-right text-lg" id="resMensal">R$ 0,00</td>
+                                </tr>
+                                <tr class="border-b dark:border-white/5">
+                                    <td class="py-6">Instalação, Configuração e Treinamento <br><span class="text-[10px] opacity-40">Implantação personalizada e capacitação da equipe</span></td>
+                                    <td class="py-6 text-right text-lg text-brand" id="resSetup">R$ 0,00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="p-6 rounded-3xl bg-slate-100 dark:bg-white/5">
+                            <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Resumo da Configuração</p>
+                            <div class="flex gap-6 text-[11px] font-bold uppercase opacity-80">
+                                <span><i class="fas fa-desktop mr-1 text-brand"></i> <span id="resPcs"></span> Terminais</span>
+                                <span><i class="fas fa-building mr-1 text-brand"></i> <span id="resRegime"></span></span>
+                            </div>
                         </div>
-                        <div class="flex flex-col items-center text-center p-4">
-                            <i class="fas fa-check-circle text-emerald-500 mb-2"></i>
-                            <span class="text-[10px] font-bold uppercase opacity-60">Suporte Premium</span>
+
+                        <div class="mt-10 text-center no-print">
+                            <button id="syncBtn" onclick="generatePDF()" class="w-full bg-slate-900 dark:bg-white dark:text-slate-900 text-white py-5 rounded-3xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all">
+                                <i class="fas fa-file-pdf"></i> GERAR PDF & SINCRONIZAR
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- ABA REGISTRO CLIENTE (O MINI CRM) -->
-        <div id="tab-cliente" class="hidden animate-in slide-in-from-right duration-500 max-w-3xl mx-auto">
-            <div class="bg-white dark:bg-darkCard p-10 rounded-4xl shadow-2xl border border-slate-100 dark:border-slate-800">
-                <div class="text-center mb-10">
-                    <div class="w-20 h-20 bg-brand/10 text-brand rounded-3xl flex items-center justify-center text-3xl mx-auto mb-4">
-                        <i class="fas fa-id-card"></i>
-                    </div>
-                    <h2 class="text-2xl font-black">Dados para Contrato</h2>
-                    <p class="text-slate-400 text-sm">Registre os detalhes da empresa para finalizar o pedido.</p>
+        <section id="step-config" class="step-content max-w-3xl mx-auto">
+            <div class="bg-white dark:bg-darkCard rounded-4xl p-10 border dark:border-white/5 shadow-2xl">
+                <div class="flex justify-between items-center mb-10"><h2 class="text-2xl font-black">Configurações</h2><button onclick="goToStep('home')" class="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center"><i class="fas fa-times"></i></button></div>
+                <div class="mb-10 p-6 rounded-3xl bg-emerald-500/5 border border-emerald-500/20">
+                    <label class="text-xs font-black text-emerald-500 uppercase mb-3 block">URL Sincronização Planilha</label>
+                    <input type="text" id="sheetLink" placeholder="https://..." class="w-full bg-white dark:bg-darkBg p-4 rounded-2xl outline-none border-none font-medium text-sm">
                 </div>
-
-                <div class="space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                            <label class="text-xs font-black text-slate-400 uppercase mb-2 block">Nome Fantasia / Razão Social</label>
-                            <input type="text" id="clientName" placeholder="Ex: Mercado do João Ltda" class="w-full bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border-2 border-transparent focus:border-brand outline-none font-bold">
-                        </div>
-                        <div>
-                            <label class="text-xs font-black text-slate-400 uppercase mb-2 block">CNPJ ou CPF</label>
-                            <input type="text" id="clientTaxId" placeholder="00.000.000/0000-00" class="w-full bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border-2 border-transparent focus:border-brand outline-none font-bold">
-                        </div>
-                        <div>
-                            <label class="text-xs font-black text-slate-400 uppercase mb-2 block">Telefone de Contato</label>
-                            <input type="text" id="clientPhone" placeholder="(00) 00000-0000" class="w-full bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border-2 border-transparent focus:border-brand outline-none font-bold">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="text-xs font-black text-slate-400 uppercase mb-2 block">Endereço Completo</label>
-                            <input type="text" id="clientAddress" placeholder="Rua, Número, Bairro, Cidade - UF" class="w-full bg-slate-50 dark:bg-slate-900 p-4 rounded-2xl border-2 border-transparent focus:border-brand outline-none font-bold">
-                        </div>
-                    </div>
-
-                    <div class="pt-6">
-                        <button onclick="saveClientAndFinish()" class="w-full bg-brand hover:bg-brandHover text-white p-5 rounded-2xl font-black shadow-lg shadow-brand/30 flex items-center justify-center gap-3 transition-all active:scale-95">
-                            <i class="fas fa-save text-lg"></i>
-                            FINALIZAR E SALVAR REGISTRO
-                        </button>
-                    </div>
-                </div>
+                <div id="systems-config-list" class="space-y-3 mb-8"></div>
+                <button onclick="addNewSystem()" class="text-brand text-xs font-black mb-10 block">+ NOVO SERVIÇO</button>
+                <button onclick="saveAllSettings()" class="w-full bg-brand text-white p-5 rounded-3xl font-black shadow-lg">SALVAR TUDO</button>
             </div>
-        </div>
-
-        <!-- ABA CONFIGURAÇÕES -->
-        <div id="tab-config" class="hidden animate-in slide-in-from-bottom duration-500 max-w-4xl mx-auto">
-            <div class="bg-white dark:bg-darkCard p-8 rounded-4xl shadow-2xl border border-slate-100 dark:border-slate-800">
-                <div class="flex justify-between items-center mb-10">
-                    <div>
-                        <h2 class="text-xl font-black">Painel de Precificação</h2>
-                        <p class="text-slate-400 text-xs">Ajuste os valores base e multiplicadores da Lógica PIPO.</p>
-                    </div>
-                    <button onclick="saveConfigs()" class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-2xl text-xs font-black shadow-lg shadow-emerald-500/20 transition-all">
-                        SALVAR ALTERAÇÕES
-                    </button>
-                </div>
-
-                <div id="config-container" class="space-y-6">
-                    <!-- Gerado Dinamicamente -->
-                </div>
-            </div>
-        </div>
-
+        </section>
     </main>
 
-    <!-- NOTIFICAÇÃO -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl text-sm font-bold opacity-0 transition-all pointer-events-none z-[100]">
-        Ação realizada com sucesso!
-    </div>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-full shadow-2xl text-xs font-bold opacity-0 transition-all z-[100]"></div>
 
     <script>
         let CURRENT_REGIME = 'MEI';
         let APP_DATA = {
+            sheetLink: "",
             systems: {
-                ZEUS: { MEI: 150, SIMPLES: 200, PRESUMIDO: 350, multiplier: 3 },
-                LCERP: { MEI: 300, SIMPLES: 350, PRESUMIDO: 350, multiplier: 5 },
-                NAVIVENDAS: { MEI: 200, SIMPLES: 300, PRESUMIDO: 350, multiplier: 4 },
-                LCWEB: { MEI: 200, SIMPLES: 300, PRESUMIDO: 350, multiplier: 4 }
-            },
-            pipoPercent: 20
+                "NAVIVENDAS": { MEI: 200, SIMPLES: 250, PRESUMIDO: 300, multiplier: 4 },
+                "LCWEB": { MEI: 180, SIMPLES: 220, PRESUMIDO: 280, multiplier: 4 },
+                "LCERP": { MEI: 300, SIMPLES: 350, PRESUMIDO: 400, multiplier: 5 },
+                "ZEUS": { MEI: 150, SIMPLES: 200, PRESUMIDO: 350, multiplier: 3 }
+            }
         };
 
-        // Carregamento inicial do LocalStorage
-        const savedData = localStorage.getItem('pipo_v3_data');
-        if(savedData) APP_DATA = JSON.parse(savedData);
+        const storage = localStorage.getItem('pipo_pro_v7');
+        if(storage) APP_DATA = JSON.parse(storage);
 
         function fmt(v) { return v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
-
         function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.classList.remove('opacity-0');
-            t.classList.add('bottom-12');
-            setTimeout(() => {
-                t.classList.add('opacity-0');
-                t.classList.remove('bottom-12');
-            }, 3000);
+            const t = document.getElementById('toast'); t.innerText = msg;
+            t.classList.replace('opacity-0', 'opacity-100');
+            setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 3000);
+        }
+
+        function goToStep(step) {
+            document.querySelectorAll('.step-content').forEach(s => s.classList.remove('active'));
+            document.getElementById('step-' + step).classList.add('active');
+            if(step === 'orcamento') calculate();
         }
 
         function calculate() {
             const sysKey = document.getElementById('sysSelect').value;
-            const pcs = parseInt(document.getElementById('pcCount').value) || 0;
-            const discount = parseFloat(document.getElementById('setupDiscount').value) || 0;
-            const installmentCount = parseInt(document.getElementById('installments').value);
-
+            const pcs = parseInt(document.getElementById('pcCount').value) || 1;
+            const discount = parseFloat(document.getElementById('discountSelect').value) || 0;
             const sys = APP_DATA.systems[sysKey];
-            const baseValue = sys[CURRENT_REGIME] || 0;
+            if(!sys) return;
 
-            // Lógica PIPO: Adicional de 20% do valor base POR PC
-            const pcPrice = baseValue * (APP_DATA.pipoPercent / 100);
-            const totalPcAddon = pcPrice * pcs;
-            const totalMonthly = baseValue + totalPcAddon;
-
-            // Setup: Mensalidade Total * Multiplicador
-            const rawSetup = totalMonthly * sys.multiplier;
-            const setupFinal = Math.max(0, rawSetup - discount);
-            const parcelValue = setupFinal / installmentCount;
-
-            // Atualizar UI
-            document.getElementById('resBase').innerText = fmt(baseValue);
-            document.getElementById('resPipo').innerText = fmt(totalPcAddon);
-            document.getElementById('resMensal').innerText = fmt(totalMonthly);
-            document.getElementById('resSetup').innerText = fmt(setupFinal);
-            document.getElementById('setupLabel').innerText = `Setup de Implantação (${sys.multiplier}x)`;
+            const base = sys[CURRENT_REGIME];
+            const addon = (base * 0.20) * (pcs - 1);
+            const monthly = base + addon;
             
-            if(installmentCount > 1) {
-                document.getElementById('resParcelas').innerText = `${installmentCount} parcelas sem juros de ${fmt(parcelValue)}`;
-            } else {
-                document.getElementById('resParcelas').innerText = "Pagamento à vista no ato da instalação";
+            // Lógica de Desconto aplicada apenas ao Setup (Instalação)
+            const rawSetup = monthly * sys.multiplier;
+            const finalSetup = rawSetup * (1 - discount);
+
+            document.getElementById('resSysName').innerText = sysKey;
+            document.getElementById('resClientLabel').innerText = document.getElementById('clientName').value || "Cliente Preferencial";
+            document.getElementById('resDate').innerText = new Date().toLocaleDateString('pt-BR');
+            document.getElementById('resMensal').innerText = fmt(monthly);
+            document.getElementById('resSetup').innerText = fmt(finalSetup);
+            document.getElementById('resPcs').innerText = pcs;
+            document.getElementById('resRegime').innerText = CURRENT_REGIME;
+        }
+
+        async function generatePDF() {
+            const btn = document.getElementById('syncBtn');
+            const data = {
+                data: new Date().toLocaleDateString('pt-BR'),
+                cliente: document.getElementById('clientName').value,
+                sistema: document.getElementById('sysSelect').value,
+                mensalidade: document.getElementById('resMensal').innerText,
+                instalacao: document.getElementById('resSetup').innerText,
+                desconto: document.getElementById('discountSelect').value * 100 + "%"
+            };
+
+            // 1. Sincroniza com a planilha em segundo plano
+            if(APP_DATA.sheetLink) {
+                fetch(APP_DATA.sheetLink, { method: 'POST', mode: 'no-cors', body: JSON.stringify(data) });
             }
+
+            // 2. Abre a caixa de impressão do navegador (PDF)
+            showToast("Preparando Proposta Profissional...");
+            setTimeout(() => { window.print(); }, 500);
         }
 
         function setRegime(reg) {
             CURRENT_REGIME = reg;
-            document.querySelectorAll('.regime-btn').forEach(b => {
+            document.querySelectorAll('.reg-btn').forEach(b => {
                 b.classList.remove('bg-brand', 'text-white', 'border-brand');
-                b.classList.add('border-slate-200', 'dark:border-slate-800');
+                b.classList.add('dark:border-slate-800', 'border-slate-200');
             });
-            const active = document.getElementById('reg-' + reg);
-            active.classList.add('bg-brand', 'text-white', 'border-brand');
-            active.classList.remove('border-slate-200', 'dark:border-slate-800');
+            document.getElementById('reg-' + reg).classList.replace('dark:border-slate-800', 'border-brand');
+            document.getElementById('reg-' + reg).classList.add('bg-brand', 'text-white');
             calculate();
         }
 
@@ -361,96 +281,47 @@
             calculate();
         }
 
-        function switchTab(tab) {
-            const tabs = ['orcamento', 'cliente', 'config'];
-            tabs.forEach(t => {
-                document.getElementById('tab-' + t).classList.add('hidden');
-                document.getElementById('btn-' + t).className = 'tab-btn tab-inactive';
+        function renderConfigSystems() {
+            const container = document.getElementById('systems-config-list');
+            container.innerHTML = '';
+            Object.entries(APP_DATA.systems).forEach(([name, values]) => {
+                const div = document.createElement('div');
+                div.className = "p-4 bg-slate-100 dark:bg-white/5 rounded-2xl flex flex-wrap gap-4 items-end";
+                div.innerHTML = `<div class="flex-1">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase">${name}</span>
+                        <div class="grid grid-cols-4 gap-2 mt-1">
+                            <input type="number" onchange="updateSysVal('${name}', 'MEI', this.value)" value="${values.MEI}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none">
+                            <input type="number" onchange="updateSysVal('${name}', 'SIMPLES', this.value)" value="${values.SIMPLES}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none">
+                            <input type="number" onchange="updateSysVal('${name}', 'PRESUMIDO', this.value)" value="${values.PRESUMIDO}" class="bg-white dark:bg-darkBg p-2 rounded-lg text-xs font-bold border-none">
+                            <input type="number" onchange="updateSysVal('${name}', 'multiplier', this.value)" value="${values.multiplier}" class="bg-brand/10 text-brand p-2 rounded-lg text-xs font-black border-none">
+                        </div>
+                    </div><button onclick="removeSystem('${name}')" class="text-red-500 p-2"><i class="fas fa-trash"></i></button>`;
+                container.appendChild(div);
             });
-
-            document.getElementById('tab-' + tab).classList.remove('hidden');
-            document.getElementById('btn-' + tab).className = 'tab-btn tab-active';
-
-            if(tab === 'config') renderConfigs();
+            document.getElementById('sheetLink').value = APP_DATA.sheetLink;
         }
 
-        function renderConfigs() {
-            const container = document.getElementById('config-container');
-            container.innerHTML = '';
-
-            for (const [key, data] of Object.entries(APP_DATA.systems)) {
-                const div = document.createElement('div');
-                div.className = "bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-100 dark:border-slate-800";
-                div.innerHTML = `
-                    <div class="flex justify-between items-center mb-4">
-                        <h4 class="font-black text-brand">${key}</h4>
-                        <div class="flex items-center gap-2">
-                             <span class="text-[9px] font-black text-slate-400 uppercase">Multiplicador Setup</span>
-                             <input type="number" data-sys="${key}" data-type="multiplier" value="${data.multiplier}" class="config-input w-16 p-2 bg-white dark:bg-darkBg rounded-xl border-2 border-brand/20 text-center font-bold">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 block mb-1">MEI</label>
-                            <input type="number" data-sys="${key}" data-type="MEI" value="${data.MEI}" class="config-input w-full p-3 bg-white dark:bg-darkBg rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-bold">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 block mb-1">SIMPLES</label>
-                            <input type="number" data-sys="${key}" data-type="SIMPLES" value="${data.SIMPLES}" class="config-input w-full p-3 bg-white dark:bg-darkBg rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-bold">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 block mb-1">PRESUMIDO</label>
-                            <input type="number" data-sys="${key}" data-type="PRESUMIDO" value="${data.PRESUMIDO}" class="config-input w-full p-3 bg-white dark:bg-darkBg rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-bold">
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
+        function updateSysVal(sys, field, val) { APP_DATA.systems[sys][field] = parseFloat(val); }
+        function addNewSystem() {
+            const name = prompt("Nome do Sistema:").toUpperCase();
+            if(name && !APP_DATA.systems[name]) {
+                APP_DATA.systems[name] = { MEI: 100, SIMPLES: 150, PRESUMIDO: 200, multiplier: 3 };
+                renderConfigSystems();
             }
         }
-
-        function saveConfigs() {
-            const inputs = document.querySelectorAll('.config-input');
-            inputs.forEach(input => {
-                const { sys, type } = input.dataset;
-                APP_DATA.systems[sys][type] = parseFloat(input.value);
-            });
-            localStorage.setItem('pipo_v3_data', JSON.stringify(APP_DATA));
-            initSelect();
-            showToast("Configurações atualizadas com sucesso!");
-            switchTab('orcamento');
+        function removeSystem(name) { delete APP_DATA.systems[name]; renderConfigSystems(); }
+        function saveAllSettings() {
+            APP_DATA.sheetLink = document.getElementById('sheetLink').value;
+            localStorage.setItem('pipo_pro_v7', JSON.stringify(APP_DATA));
+            initSelects(); showToast("Configurações Salvas!"); goToStep('home');
         }
-
-        function saveClientAndFinish() {
-            const nome = document.getElementById('clientName').value;
-            if(!nome) return showToast("Por favor, preencha ao menos o nome da empresa.");
-            
-            // Aqui simulamos o registro
-            showToast("✅ Registro salvo localmente! Orçamento pronto.");
-            setTimeout(() => switchTab('orcamento'), 1500);
+        function initSelects() {
+            const s = document.getElementById('sysSelect'); s.innerHTML = '';
+            Object.keys(APP_DATA.systems).forEach(n => s.add(new Option(n, n)));
         }
-
-        function initSelect() {
-            const select = document.getElementById('sysSelect');
-            const current = select.value;
-            select.innerHTML = '';
-            Object.keys(APP_DATA.systems).forEach(key => {
-                const opt = document.createElement('option');
-                opt.value = key;
-                opt.innerText = key;
-                select.appendChild(opt);
-            });
-            if(current) select.value = current;
-            calculate();
-        }
-
-        // Eventos
+        function showTab(tab) { goToStep(tab); if(tab === 'config') renderConfigSystems(); }
         document.getElementById('themeToggle').onclick = () => document.documentElement.classList.toggle('dark');
-        document.querySelectorAll('input, select').forEach(el => el.oninput = calculate);
-
-        window.onload = () => {
-            initSelect();
-            setRegime('MEI');
-        };
+        window.onload = () => { initSelects(); setRegime('MEI'); };
     </script>
 </body>
 </html>
